@@ -106,6 +106,13 @@
     document.body.classList.remove('voucher-print-mode');
   }
 
+  function closeOpenVoucherModal() {
+    var activeModal = document.querySelector('.voucher-modal:not([hidden])');
+    if (activeModal) {
+      closeModal(activeModal);
+    }
+  }
+
   function setAmountPreview(modal, amount) {
     var formatted = formatAmountCZK(amount);
     modal.querySelector('[data-voucher-main]').textContent = formatted;
@@ -133,10 +140,6 @@
     if (!form) {
       return;
     }
-    if (form.dataset.voucherInitialized === '1') {
-      return;
-    }
-    form.dataset.voucherInitialized = '1';
 
     var priceSelect = document.querySelector(SELECTORS.price);
     var customPriceInput = document.querySelector(SELECTORS.customPrice);
@@ -144,6 +147,10 @@
     if (!priceSelect || !customPriceInput) {
       return;
     }
+    if (form.dataset.voucherInitialized === '1') {
+      return;
+    }
+    form.dataset.voucherInitialized = '1';
 
     var openBtn = document.createElement('button');
     openBtn.type = 'button';
@@ -195,7 +202,7 @@
               filename: 'poukaz.pdf',
               image: { type: 'jpeg', quality: 0.95 },
               html2canvas: { scale: 2, useCORS: true },
-              jsPDF: { unit: 'px', format: [1536, 1024], orientation: 'landscape' }
+              jsPDF: { unit: 'in', format: [16, 10.6667], orientation: 'landscape' }
             })
             .from(canvas)
             .save()
@@ -212,8 +219,8 @@
 
     if (!window[GLOBAL_EVENTS_BOUND]) {
       document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape' && !modal.hidden) {
-          closeModal(modal);
+        if (event.key === 'Escape') {
+          closeOpenVoucherModal();
         }
       });
 
