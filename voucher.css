@@ -178,8 +178,9 @@
   }
 
   body.voucher-print-mode .voucher-canvas {
-    width: 100vw;
-    max-width: none;
+    width: 100%;
+    max-width: 1536px;
+    margin: 0 auto;
     break-inside: avoid;
   }
 }

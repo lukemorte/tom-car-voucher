@@ -194,23 +194,35 @@
 
       if (target.dataset.voucherAction === 'pdf') {
         if (typeof window.html2pdf === 'function') {
-          var canvas = buildPdfSource(modal);
+          var canvas;
+          try {
+            canvas = buildPdfSource(modal);
+            var worker = window.html2pdf()
+              .set({
+                margin: 0,
+                filename: 'poukaz.pdf',
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: [16, 10.6667], orientation: 'landscape' }
+              })
+              .from(canvas)
+              .save();
 
-          window.html2pdf()
-            .set({
-              margin: 0,
-              filename: 'poukaz.pdf',
-              image: { type: 'jpeg', quality: 0.95 },
-              html2canvas: { scale: 2, useCORS: true },
-              jsPDF: { unit: 'in', format: [16, 10.6667], orientation: 'landscape' }
-            })
-            .from(canvas)
-            .save()
-            .then(function () {
+            if (worker && typeof worker.then === 'function') {
+              worker.then(function () {
+                canvas.remove();
+              }, function () {
+                canvas.remove();
+              });
+            } else if (canvas) {
               canvas.remove();
-            }, function () {
+            }
+          } catch (error) {
+            if (canvas) {
               canvas.remove();
-            });
+            }
+            window.alert('Nepodařilo se vytvořit PDF. Zkuste to prosím znovu.');
+          }
         } else {
           window.alert('PDF export je volitelný. Přidejte html2pdf.js přes CDN.');
         }
