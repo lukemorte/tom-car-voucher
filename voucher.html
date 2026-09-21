@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Demo – TOM-CAR poukaz</title>
+    <link rel="stylesheet" href="voucher.css">
+  </head>
+  <body>
+    <main style="max-width:720px;margin:2rem auto;padding:0 1rem;font-family:Arial,sans-serif;">
+      <h1>Demo formulář poukazu</h1>
+      <p>Tento formulář simuluje CMS formulář a používá stejné selektory jako produkční web.</p>
+
+      <form id="frm-bsgrid-col126858-fullForm" action="#" method="post">
+        <p>
+          <label for="frm-bsgrid-col126858-fullForm-person">Osoba</label><br>
+          <input id="frm-bsgrid-col126858-fullForm-person" name="person" required>
+        </p>
+
+        <p>
+          <label for="frm-bsgrid-col126858-fullForm-email">E-mail</label><br>
+          <input id="frm-bsgrid-col126858-fullForm-email" name="email" type="email" required>
+        </p>
+
+        <p>
+          <label for="frm-bsgrid-col126858-fullForm-phone">Telefon</label><br>
+          <input id="frm-bsgrid-col126858-fullForm-phone" name="phone" type="tel" required>
+        </p>
+
+        <p>
+          <label for="frm-bsgrid-col126858-fullForm-price">Částka</label><br>
+          <select id="frm-bsgrid-col126858-fullForm-price" name="price" required>
+            <option value="1000">1 000 Kč</option>
+            <option value="2000">2 000 Kč</option>
+            <option value="5000">5 000 Kč</option>
+            <option value="custom">Vlastní částka</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="frm-bsgrid-col126858-fullForm-customprice">Vlastní částka</label><br>
+          <input id="frm-bsgrid-col126858-fullForm-customprice" name="customprice" inputmode="decimal" placeholder="Např. 3500">
+        </p>
+
+        <p>
+          <button type="submit">Odeslat formulář</button>
+        </p>
+      </form>
+    </main>
+
+    <script>
+      document.getElementById('frm-bsgrid-col126858-fullForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        window.alert('Demo submit: původní submit/AJAX logika zůstává nedotčena.');
+      });
+    </script>
+
+    <script src="voucher.js"></script>
+    <!-- Volitelné: PDF export přes html2pdf.js -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P6kQX6y5v9z7w4fGxAtF5NCz7L+G5kZZgwyU0YJIUKGwEuITdSb9VjA36TObgGJE0E7E5Wdl66Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+  </body>
+</html>
