@@ -56,13 +56,23 @@ Stávající submit/AJAX chování formuláře není měněné.
 
 ## Nastavení cesty k obrázku
 
-Výchozí cesta v `voucher.js`:
+Výchozí cesta je `voucher-background.jpg`.
 
-```js
-var BACKGROUND_IMAGE_PATH = 'voucher-background.jpg';
+Bez editace `voucher.js` ji můžeš změnit:
+
+1. atributem na formuláři:
+
+```html
+<form id="frm-bsgrid-col126858-fullForm" data-voucher-background="/assets/voucher-background.jpg">
 ```
 
-Pokud je obrázek jinde, uprav tuto hodnotu (např. `/assets/voucher-background.jpg`).
+2. nebo globální konfigurací před načtením `voucher.js`:
+
+```html
+<script>
+  window.VOUCHER_CONFIG = { backgroundImagePath: '/assets/voucher-background.jpg' };
+</script>
+```
 
 ## Tisk a PDF
 

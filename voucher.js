@@ -3,14 +3,14 @@
 
   var SELECTORS = {
     form: '#frm-bsgrid-col126858-fullForm',
-    person: '#frm-bsgrid-col126858-fullForm-person',
-    email: '#frm-bsgrid-col126858-fullForm-email',
-    phone: '#frm-bsgrid-col126858-fullForm-phone',
     price: '#frm-bsgrid-col126858-fullForm-price',
     customPrice: '#frm-bsgrid-col126858-fullForm-customprice'
   };
 
-  var BACKGROUND_IMAGE_PATH = 'voucher-background.jpg';
+  function getBackgroundImagePath(form) {
+    var globalConfig = window.VOUCHER_CONFIG || {};
+    return form.getAttribute('data-voucher-background') || globalConfig.backgroundImagePath || 'voucher-background.jpg';
+  }
   var GLOBAL_EVENTS_BOUND = '__voucherGlobalEventsBound';
 
   function safeText(value) {
@@ -62,7 +62,7 @@
     return amount;
   }
 
-  function buildModal() {
+  function buildModal(backgroundImagePath) {
     var modal = document.createElement('section');
     modal.className = 'voucher-modal';
     modal.hidden = true;
@@ -80,7 +80,7 @@
       '    <button type="button" data-voucher-action="close">Zavřít</button>',
       '  </div>',
       '  <div class="voucher-canvas" aria-label="Náhled poukazu">',
-      '    <img class="voucher-canvas__image" alt="Dárkový poukaz" src="' + BACKGROUND_IMAGE_PATH + '">',
+      '    <img class="voucher-canvas__image" alt="Dárkový poukaz" src="' + backgroundImagePath + '">',
       '    <p class="voucher-amount-main" data-voucher-main>0 Kč</p>',
       '    <p class="voucher-amount-badge" data-voucher-badge>0 Kč</p>',
       '  </div>',
@@ -157,7 +157,7 @@
     openBtn.className = 'voucher-open-btn';
     openBtn.textContent = 'Zobrazit poukaz';
 
-    var modal = buildModal();
+    var modal = buildModal(getBackgroundImagePath(form));
 
     openBtn.addEventListener('click', function () {
       var amount = getAmount(priceSelect, customPriceInput);
