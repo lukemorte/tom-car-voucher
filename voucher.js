@@ -11,6 +11,7 @@
   };
 
   var BACKGROUND_IMAGE_PATH = 'voucher-background.jpg';
+  var GLOBAL_EVENTS_BOUND = '__voucherGlobalEventsBound';
 
   function safeText(value) {
     return (value == null ? '' : String(value)).trim();
@@ -111,11 +112,31 @@
     modal.querySelector('[data-voucher-badge]').textContent = formatted;
   }
 
+  function buildPdfSource(modal) {
+    var originalCanvas = modal.querySelector('.voucher-canvas');
+    var clone = originalCanvas.cloneNode(true);
+
+    clone.style.width = '1536px';
+    clone.style.height = '1024px';
+    clone.style.maxWidth = 'none';
+    clone.style.position = 'fixed';
+    clone.style.left = '-99999px';
+    clone.style.top = '0';
+    clone.style.margin = '0';
+
+    document.body.appendChild(clone);
+    return clone;
+  }
+
   function initVoucher() {
     var form = document.querySelector(SELECTORS.form);
     if (!form) {
       return;
     }
+    if (form.dataset.voucherInitialized === '1') {
+      return;
+    }
+    form.dataset.voucherInitialized = '1';
 
     var priceSelect = document.querySelector(SELECTORS.price);
     var customPriceInput = document.querySelector(SELECTORS.customPrice);
@@ -166,7 +187,8 @@
 
       if (target.dataset.voucherAction === 'pdf') {
         if (typeof window.html2pdf === 'function') {
-          var canvas = modal.querySelector('.voucher-canvas');
+          var canvas = buildPdfSource(modal);
+
           window.html2pdf()
             .set({
               margin: 0,
@@ -176,22 +198,30 @@
               jsPDF: { unit: 'px', format: [1536, 1024], orientation: 'landscape' }
             })
             .from(canvas)
-            .save();
+            .save()
+            .then(function () {
+              canvas.remove();
+            }, function () {
+              canvas.remove();
+            });
         } else {
           window.alert('PDF export je volitelný. Přidejte html2pdf.js přes CDN.');
         }
       }
     });
 
-    document.addEventListener('keydown', function (event) {
-      if (event.key === 'Escape' && !modal.hidden) {
-        closeModal(modal);
-      }
-    });
+    if (!window[GLOBAL_EVENTS_BOUND]) {
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !modal.hidden) {
+          closeModal(modal);
+        }
+      });
 
-    window.addEventListener('afterprint', function () {
-      document.body.classList.remove('voucher-print-mode');
-    });
+      window.addEventListener('afterprint', function () {
+        document.body.classList.remove('voucher-print-mode');
+      });
+      window[GLOBAL_EVENTS_BOUND] = true;
+    }
 
   }
 
