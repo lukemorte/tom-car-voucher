@@ -66,7 +66,7 @@ Pokud je obrázek jinde, uprav tuto hodnotu (např. `/assets/voucher-background.
 
 ## Tisk a PDF
 
-- Tisk funguje nativně přes browser (`window.print`) a `@media print` tiskne pouze poukaz.
+- Tisk funguje nativně přes prohlížeč (`window.print`) a `@media print` tiskne pouze poukaz.
 - PDF export je volitelný – pokud chceš tlačítko **Export PDF** aktivovat, přidej html2pdf.js přes CDN:
 
 ```html

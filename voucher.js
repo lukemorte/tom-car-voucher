@@ -117,9 +117,6 @@
       return;
     }
 
-    var personInput = document.querySelector(SELECTORS.person);
-    var emailInput = document.querySelector(SELECTORS.email);
-    var phoneInput = document.querySelector(SELECTORS.phone);
     var priceSelect = document.querySelector(SELECTORS.price);
     var customPriceInput = document.querySelector(SELECTORS.customPrice);
 
@@ -165,9 +162,6 @@
       if (target.dataset.voucherAction === 'print') {
         document.body.classList.add('voucher-print-mode');
         window.print();
-        window.setTimeout(function () {
-          document.body.classList.remove('voucher-print-mode');
-        }, 500);
       }
 
       if (target.dataset.voucherAction === 'pdf') {
@@ -199,14 +193,6 @@
       document.body.classList.remove('voucher-print-mode');
     });
 
-    [personInput, emailInput, phoneInput].forEach(function (input) {
-      if (!input) {
-        return;
-      }
-      input.addEventListener('change', function () {
-        safeText(input.value);
-      });
-    });
   }
 
   if (document.readyState === 'loading') {
