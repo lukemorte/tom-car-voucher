@@ -189,7 +189,11 @@
 
       if (target.dataset.voucherAction === 'print') {
         document.body.classList.add('voucher-print-mode');
-        window.print();
+        try {
+          window.print();
+        } finally {
+          document.body.classList.remove('voucher-print-mode');
+        }
       }
 
       if (target.dataset.voucherAction === 'pdf') {
