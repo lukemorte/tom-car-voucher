@@ -196,6 +196,7 @@
   body.voucher-print-mode .voucher-canvas {
     width: 100%;
     height: auto;
+    aspect-ratio: 1536 / 1024;
     max-width: none;
     margin: 0;
     page-break-inside: avoid;
