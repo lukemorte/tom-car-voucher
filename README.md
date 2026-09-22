@@ -76,7 +76,8 @@ Bez editace `voucher.js` ji můžeš změnit:
 
 ## Tisk a PDF
 
-- Tisk funguje nativně přes prohlížeč (`window.print`) a `@media print` tiskne pouze poukaz.
+- Tisk funguje nativně přes prohlížeč (`window.print`), ale nepoužívá tisk celého modalu: JavaScript si připraví samostatný skrytý iframe dokument obsahující jen voucher a ten teprve vytiskne.
+- Díky tomu se při tisku nepropíše formulář, modal wrapper ani zbytková výška stránky a v běžných prohlížečích se vytiskne jen jedna landscape stránka s poměrem 1536×1024.
 - PDF export je volitelný – pokud chceš tlačítko **Export PDF** aktivovat, přidej html2pdf.js přes CDN:
 
 ```html
