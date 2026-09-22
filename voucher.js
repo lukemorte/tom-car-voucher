@@ -291,6 +291,11 @@
 
     document.body.appendChild(frame);
 
+    if (!frame.contentWindow || !frame.contentWindow.document) {
+      frame.remove();
+      return null;
+    }
+
     var frameDoc = frame.contentWindow.document;
     frameDoc.open();
     frameDoc.write([
@@ -320,6 +325,13 @@
     document.body.dataset.voucherPrinting = '1';
 
     var printFrame = createPrintFrame(modal);
+    if (!printFrame || !printFrame.contentWindow) {
+      document.body.removeAttribute('data-voucher-printing');
+      removePrintFrame();
+      window.alert('Nepodařilo se připravit tisk poukazu. Zkuste to prosím znovu.');
+      return;
+    }
+
     var printWindow = printFrame.contentWindow;
     var finished = false;
 
