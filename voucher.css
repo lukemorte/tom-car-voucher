@@ -149,7 +149,7 @@
 
 @media print {
   @page {
-    size: 16in 10.6667in;
+    size: landscape;
     margin: 0;
   }
 
@@ -185,9 +185,9 @@
   body.voucher-print-mode .voucher-modal__content {
     box-shadow: none;
     border-radius: 0;
-    width: 16in;
-    height: 10.6667in;
-    max-height: 10.6667in;
+    width: 100%;
+    height: auto;
+    max-height: none;
     overflow: visible;
     padding: 0;
     margin: 0;
@@ -195,7 +195,7 @@
 
   body.voucher-print-mode .voucher-canvas {
     width: 100%;
-    height: 100%;
+    height: auto;
     max-width: none;
     margin: 0;
     page-break-inside: avoid;
