@@ -12,6 +12,18 @@
     return form.getAttribute('data-voucher-background') || globalConfig.backgroundImagePath || 'voucher-background.jpg';
   }
   var GLOBAL_EVENTS_BOUND = '__voucherGlobalEventsBound';
+  var PRINT_FRAME_ID = 'voucher-print-frame';
+  var PRINT_CUSTOM_PROPERTIES = [
+    '--voucher-aspect-ratio',
+    '--voucher-main-left',
+    '--voucher-main-top',
+    '--voucher-main-width',
+    '--voucher-badge-left',
+    '--voucher-badge-top',
+    '--voucher-badge-width',
+    '--voucher-main-font',
+    '--voucher-badge-font'
+  ];
 
   function safeText(value) {
     return (value == null ? '' : String(value)).trim();
@@ -103,7 +115,8 @@
   function closeModal(modal) {
     modal.hidden = true;
     document.body.style.overflow = '';
-    document.body.classList.remove('voucher-print-mode');
+    document.body.removeAttribute('data-voucher-printing');
+    removePrintFrame();
   }
 
   function closeOpenVoucherModal() {
@@ -133,6 +146,201 @@
 
     document.body.appendChild(clone);
     return clone;
+  }
+
+  function getPrintCssVariables() {
+    var rootStyles = window.getComputedStyle(document.documentElement);
+
+    return PRINT_CUSTOM_PROPERTIES.map(function (name) {
+      var value = rootStyles.getPropertyValue(name).trim();
+      return value ? '  ' + name + ': ' + value + ';' : '';
+    }).filter(Boolean).join('\n');
+  }
+
+  function getPrintStyles() {
+    return [
+      ':root {',
+      getPrintCssVariables(),
+      '}',
+      '@page {',
+      '  size: landscape;',
+      '  margin: 0;',
+      '}',
+      'html, body {',
+      '  margin: 0;',
+      '  padding: 0;',
+      '  width: 100%;',
+      '  background: #fff;',
+      '}',
+      'body {',
+      '  overflow: hidden;',
+      '  -webkit-print-color-adjust: exact;',
+      '  print-color-adjust: exact;',
+      '}',
+      '.voucher-print-root {',
+      '  width: 100%;',
+      '  overflow: hidden;',
+      '  break-before: avoid;',
+      '  break-after: avoid;',
+      '  page-break-before: avoid;',
+      '  page-break-after: avoid;',
+      '}',
+      '.voucher-canvas {',
+      '  position: relative;',
+      '  width: 100%;',
+      '  max-width: 100%;',
+      '  margin: 0;',
+      '  aspect-ratio: var(--voucher-aspect-ratio, 1536 / 1024);',
+      '  overflow: hidden;',
+      '  break-inside: avoid;',
+      '  page-break-inside: avoid;',
+      '  background: #fff;',
+      '}',
+      '.voucher-canvas__image {',
+      '  position: absolute;',
+      '  inset: 0;',
+      '  width: 100%;',
+      '  height: 100%;',
+      '  object-fit: cover;',
+      '}',
+      '.voucher-amount-main,',
+      '.voucher-amount-badge {',
+      '  position: absolute;',
+      '  margin: 0;',
+      '  color: #111827;',
+      '  font-family: "Segoe UI", Tahoma, Arial, sans-serif;',
+      '  font-weight: 700;',
+      '  line-height: 1;',
+      '  letter-spacing: 0.01em;',
+      '  text-align: center;',
+      '  white-space: nowrap;',
+      '  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.35);',
+      '}',
+      '.voucher-amount-main {',
+      '  left: var(--voucher-main-left);',
+      '  top: var(--voucher-main-top);',
+      '  width: var(--voucher-main-width);',
+      '  font-size: var(--voucher-main-font);',
+      '}',
+      '.voucher-amount-badge {',
+      '  left: var(--voucher-badge-left);',
+      '  top: var(--voucher-badge-top);',
+      '  width: var(--voucher-badge-width);',
+      '  font-size: var(--voucher-badge-font);',
+      '}'
+    ].join('\n');
+  }
+
+  function waitForImage(image) {
+    return new Promise(function (resolve) {
+      if (!image || image.complete) {
+        resolve();
+        return;
+      }
+
+      function finish() {
+        image.removeEventListener('load', finish);
+        image.removeEventListener('error', finish);
+        resolve();
+      }
+
+      image.addEventListener('load', finish, { once: true });
+      image.addEventListener('error', finish, { once: true });
+    });
+  }
+
+  function waitForNextFrame(frameWindow) {
+    return new Promise(function (resolve) {
+      var raf = frameWindow.requestAnimationFrame || function (callback) {
+        return frameWindow.setTimeout(callback, 16);
+      };
+
+      raf(function () {
+        raf(resolve);
+      });
+    });
+  }
+
+  function removePrintFrame() {
+    var existingFrame = document.getElementById(PRINT_FRAME_ID);
+    if (existingFrame) {
+      existingFrame.remove();
+    }
+  }
+
+  function createPrintFrame(modal) {
+    removePrintFrame();
+
+    var voucherCanvas = modal.querySelector('.voucher-canvas');
+    var frame = document.createElement('iframe');
+    frame.id = PRINT_FRAME_ID;
+    frame.className = 'voucher-print-frame';
+    frame.setAttribute('title', 'Tisk dárkového poukazu');
+
+    document.body.appendChild(frame);
+
+    var frameDoc = frame.contentWindow.document;
+    frameDoc.open();
+    frameDoc.write([
+      '<!doctype html>',
+      '<html lang="cs">',
+      '<head>',
+      '  <meta charset="utf-8">',
+      '  <meta name="viewport" content="width=device-width, initial-scale=1">',
+      '  <title>Tisk dárkového poukazu</title>',
+      '  <style>' + getPrintStyles() + '</style>',
+      '</head>',
+      '<body>',
+      '  <div class="voucher-print-root">' + voucherCanvas.outerHTML + '</div>',
+      '</body>',
+      '</html>'
+    ].join(''));
+    frameDoc.close();
+
+    return frame;
+  }
+
+  function printVoucher(modal) {
+    if (document.body.dataset.voucherPrinting === '1') {
+      return;
+    }
+
+    document.body.dataset.voucherPrinting = '1';
+
+    var printFrame = createPrintFrame(modal);
+    var printWindow = printFrame.contentWindow;
+    var finished = false;
+
+    function cleanup() {
+      if (finished) {
+        return;
+      }
+
+      finished = true;
+      document.body.removeAttribute('data-voucher-printing');
+      removePrintFrame();
+      window.removeEventListener('focus', handleFocus);
+    }
+
+    function handleFocus() {
+      window.setTimeout(cleanup, 0);
+    }
+
+    printWindow.addEventListener('afterprint', cleanup, { once: true });
+    window.addEventListener('focus', handleFocus, { once: true });
+
+    waitForImage(printWindow.document.querySelector('.voucher-canvas__image'))
+      .then(function () {
+        return waitForNextFrame(printWindow);
+      })
+      .then(function () {
+        printWindow.focus();
+        printWindow.print();
+      })
+      .catch(function () {
+        cleanup();
+        window.alert('Nepodařilo se připravit tisk poukazu. Zkuste to prosím znovu.');
+      });
   }
 
   function initVoucher() {
@@ -188,12 +396,7 @@
       }
 
       if (target.dataset.voucherAction === 'print') {
-        document.body.classList.add('voucher-print-mode');
-        try {
-          window.print();
-        } finally {
-          document.body.classList.remove('voucher-print-mode');
-        }
+        printVoucher(modal);
       }
 
       if (target.dataset.voucherAction === 'pdf') {
@@ -240,9 +443,6 @@
         }
       });
 
-      window.addEventListener('afterprint', function () {
-        document.body.classList.remove('voucher-print-mode');
-      });
       window[GLOBAL_EVENTS_BOUND] = true;
     }
 
