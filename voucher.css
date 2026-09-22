@@ -161,9 +161,7 @@
   }
 
   body.voucher-print-mode {
-    width: 16in;
-    height: 10.6667in;
-    overflow: hidden !important;
+    overflow: visible !important;
   }
 
   body.voucher-print-mode > *:not(.voucher-modal) {
