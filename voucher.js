@@ -163,7 +163,7 @@
       getPrintCssVariables(),
       '}',
       '@page {',
-      '  size: landscape;',
+      '  size: 16in 10.6667in;',
       '  margin: 0;',
       '}',
       'html, body {',
