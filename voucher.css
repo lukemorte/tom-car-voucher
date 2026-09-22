@@ -155,12 +155,15 @@
 
   html,
   body {
-    width: 16in;
-    height: 10.6667in;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: hidden !important;
     background: #fff;
+  }
+
+  body.voucher-print-mode {
+    width: 16in;
+    height: 10.6667in;
+    overflow: hidden !important;
   }
 
   body.voucher-print-mode > *:not(.voucher-modal) {
@@ -169,8 +172,7 @@
 
   body.voucher-print-mode .voucher-modal {
     display: block !important;
-    position: fixed;
-    inset: 0;
+    position: static;
     margin: 0;
     padding: 0;
     background: #fff;
