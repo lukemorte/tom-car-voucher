@@ -288,6 +288,8 @@
     frame.id = PRINT_FRAME_ID;
     frame.className = 'voucher-print-frame';
     frame.setAttribute('title', 'Tisk dárkového poukazu');
+    frame.setAttribute('aria-hidden', 'true');
+    frame.tabIndex = -1;
 
     document.body.appendChild(frame);
 
@@ -334,6 +336,7 @@
 
     var printWindow = printFrame.contentWindow;
     var finished = false;
+    var cleanupTimer = 0;
 
     function cleanup() {
       if (finished) {
@@ -341,6 +344,9 @@
       }
 
       finished = true;
+      if (cleanupTimer) {
+        window.clearTimeout(cleanupTimer);
+      }
       document.body.removeAttribute('data-voucher-printing');
       removePrintFrame();
       window.removeEventListener('focus', handleFocus);
@@ -363,6 +369,7 @@
       .then(function () {
         printWindow.focus();
         printWindow.print();
+        cleanupTimer = window.setTimeout(cleanup, 120000);
       })
       .catch(function () {
         cleanup();
