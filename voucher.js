@@ -178,7 +178,9 @@
       '  print-color-adjust: exact;',
       '}',
       '.voucher-print-root {',
-      '  width: 100%;',
+      '  width: 16in;',
+      '  max-width: 100%;',
+      '  margin: 0 auto;',
       '  overflow: hidden;',
       '  break-before: avoid;',
       '  break-after: avoid;',
@@ -246,6 +248,16 @@
 
       image.addEventListener('load', finish, { once: true });
       image.addEventListener('error', finish, { once: true });
+    });
+  }
+
+  function waitForFonts(frameDocument) {
+    if (!frameDocument.fonts || typeof frameDocument.fonts.ready === 'undefined') {
+      return Promise.resolve();
+    }
+
+    return frameDocument.fonts.ready.catch(function () {
+      return undefined;
     });
   }
 
@@ -330,6 +342,9 @@
     window.addEventListener('focus', handleFocus, { once: true });
 
     waitForImage(printWindow.document.querySelector('.voucher-canvas__image'))
+      .then(function () {
+        return waitForFonts(printWindow.document);
+      })
       .then(function () {
         return waitForNextFrame(printWindow);
       })
