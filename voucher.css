@@ -153,40 +153,56 @@
     margin: 0;
   }
 
-  body * {
-    visibility: hidden !important;
+  html,
+  body {
+    width: 16in;
+    height: 10.6667in;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #fff;
   }
 
-  body.voucher-print-mode .voucher-modal,
-  body.voucher-print-mode .voucher-modal * {
-    visibility: visible !important;
+  body.voucher-print-mode > *:not(.voucher-modal) {
+    display: none !important;
   }
 
   body.voucher-print-mode .voucher-modal {
-    position: static;
-    inset: auto;
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    padding: 0;
     background: #fff;
   }
 
   body.voucher-print-mode .voucher-modal__backdrop,
-  body.voucher-print-mode .voucher-actions {
+  body.voucher-print-mode .voucher-actions,
+  body.voucher-print-mode .voucher-modal__content > *:not(.voucher-canvas) {
     display: none !important;
   }
 
   body.voucher-print-mode .voucher-modal__content {
     box-shadow: none;
     border-radius: 0;
-    width: 100%;
-    max-height: none;
+    width: 16in;
+    height: 10.6667in;
+    max-height: 10.6667in;
     overflow: visible;
     padding: 0;
+    margin: 0;
   }
 
   body.voucher-print-mode .voucher-canvas {
-    width: 16in;
-    height: 10.6667in;
+    width: 100%;
+    height: 100%;
     max-width: none;
-    margin: 0 auto;
+    margin: 0;
+    page-break-inside: avoid;
+    page-break-before: avoid;
+    page-break-after: avoid;
     break-inside: avoid;
+    break-before: avoid-page;
+    break-after: avoid-page;
   }
 }
