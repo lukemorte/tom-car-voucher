@@ -297,10 +297,13 @@
     removePrintFrame();
 
     var voucherCanvas = modal.querySelector('.voucher-canvas');
+    if (!voucherCanvas) {
+      return null;
+    }
+
     var frame = document.createElement('iframe');
     frame.id = PRINT_FRAME_ID;
     frame.className = 'voucher-print-frame';
-    frame.setAttribute('title', 'Tisk dárkového poukazu');
     frame.setAttribute('aria-hidden', 'true');
     frame.tabIndex = -1;
 
