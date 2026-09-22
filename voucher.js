@@ -261,6 +261,19 @@
     });
   }
 
+  function waitForFrameLoad(frameWindow) {
+    return new Promise(function (resolve) {
+      if (frameWindow.document.readyState === 'complete') {
+        resolve();
+        return;
+      }
+
+      frameWindow.addEventListener('load', function handleLoad() {
+        resolve();
+      }, { once: true });
+    });
+  }
+
   function waitForNextFrame(frameWindow) {
     return new Promise(function (resolve) {
       var raf = frameWindow.requestAnimationFrame || function (callback) {
@@ -359,7 +372,10 @@
     printWindow.addEventListener('afterprint', cleanup, { once: true });
     window.addEventListener('focus', handleFocus, { once: true });
 
-    waitForImage(printWindow.document.querySelector('.voucher-canvas__image'))
+    waitForFrameLoad(printWindow)
+      .then(function () {
+        return waitForImage(printWindow.document.querySelector('.voucher-canvas__image'));
+      })
       .then(function () {
         return waitForFonts(printWindow.document);
       })
